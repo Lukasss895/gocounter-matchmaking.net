@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GO:COUNTER - Server Portal</title>
+    <title>GO:COUNTER - Matchmaking</title>
     <style>
         body {
             background-image: url('XhBdWC.webp');
@@ -42,375 +42,448 @@
         .subtitle {
             color: #7084a3;
             margin-top: 0;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 13px;
         }
-        .nav-menu {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .nav-item {
+        .back-link {
+            display: inline-block;
             color: #4a90e2;
             text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { color: #fff; }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Mode cards */
+        .modes {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .mode {
+            flex: 1 1 200px;
+            max-width: 240px;
+            background: rgba(5, 8, 13, 0.9);
+            border: 2px solid #253654;
+            border-left: 3px solid #4a90e2;
+            padding: 18px 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .mode:hover { border-color: #4a90e2; }
+        .mode.selected {
+            border-color: #00ff00;
+            border-left-color: #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        .mode.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .mode.disabled:hover { border-color: #253654; }
+        .mode h3 {
+            margin: 0 0 6px 0;
+            color: #fff;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .mode p {
+            margin: 0;
+            font-size: 12px;
+            color: #7084a3;
+            line-height: 1.5;
+        }
+        .mode .tag {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #f39c12;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            border: 1px solid #4a90e2;
+            background: #1b4965;
+            color: #fff;
+            font-family: inherit;
             font-weight: bold;
             font-size: 15px;
-            cursor: pointer;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            transition: color 0.2s;
+            padding: 14px 40px;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .nav-item:hover {
-            color: #fff;
+        .btn:hover { background: #256a94; }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
-        .nav-item.active {
-            color: #00ff00;
+        .btn-play {
+            background: #2e7d32;
+            border-color: #00ff00;
         }
-        .page-section {
-            display: none;
-            text-align: left;
+        .btn-play:hover { background: #3b9a40; }
+        .btn-accept {
+            background: #2e7d32;
+            border-color: #00ff00;
+            font-size: 20px;
+            padding: 18px 70px;
+        }
+        .btn-accept:hover { background: #3b9a40; }
+        .btn-cancel {
+            background: transparent;
+            border-color: #7084a3;
+            color: #bdcbf4;
+            padding: 10px 28px;
+            font-size: 13px;
+        }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.08); }
+
+        /* Searching */
+        .panel {
             background: rgba(5, 8, 13, 0.9);
-            padding: 20px;
             border-left: 3px solid #4a90e2;
-            line-height: 1.7;
-            font-size: 14px;
-            min-height: 120px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
         }
-        .page-section.active {
-            display: block;
-        }
-        .status {
-            color: #00ff00;
-            font-weight: bold;
-        }
-        .offline {
-            color: #ff4d4d;
-            font-weight: bold;
-        }
-        .demo-instruction {
-            background-color: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-left: 3px solid #f39c12;
-            margin-bottom: 25px;
-            border-radius: 0 4px 4px 0;
-        }
-        .demo-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .demo-table th, .demo-table td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #253654;
-        }
-        .demo-table th {
-            color: #4a90e2;
-            font-weight: bold;
-        }
-        .demo-table tr:hover {
-            background-color: rgba(74, 144, 226, 0.05);
-        }
-        .btn-download {
-            color: #00ff00;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.2s;
-        }
-        .btn-download:hover {
+        .panel h2 {
+            margin: 0 0 8px 0;
             color: #fff;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .code-highlight {
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 2px 6px;
-            border-radius: 4px;
+        .panel p { margin: 6px 0; font-size: 14px; color: #7084a3; }
+        .timer {
+            font-size: 44px;
+            font-weight: bold;
+            color: #00ff00;
+            margin: 14px 0;
+            letter-spacing: 3px;
+        }
+        .spinner {
+            width: 34px;
+            height: 34px;
+            margin: 0 auto 10px auto;
+            border: 4px solid #253654;
+            border-top-color: #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Match found */
+        .found-panel {
+            border-left-color: #00ff00;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.15); }
+            50% { box-shadow: 0 0 28px rgba(0, 255, 0, 0.45); }
+        }
+        .accept-bar {
+            width: 100%;
+            height: 8px;
+            background: #253654;
+            margin: 18px 0 22px 0;
+        }
+        .accept-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: #00ff00;
+            transition: width 1s linear;
+        }
+
+        /* Command fallback */
+        .cmd-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #253654;
+            padding: 12px;
+            margin: 14px 0;
+            font-size: 14px;
             color: #ff7675;
+            word-break: break-all;
+            user-select: all;
         }
-        .rank-1 { color: #ffd700; font-weight: bold; }
-        .rank-2 { color: #c0c0c0; font-weight: bold; }
-        .rank-3 { color: #cd7f32; font-weight: bold; }
-        .participant { color: #7084a3; font-style: italic; }
+        .hint {
+            font-size: 12px;
+            color: #7084a3;
+            line-height: 1.6;
+        }
+        .warn { color: #f39c12; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>GO:COUNTER</h1>
-        <p class="subtitle">.</p>
-        
-        <!-- Navigation Menu -->
-        <div class="nav-menu">
-            <span class="nav-item active" onclick="showPage('home', this)">Home</span>
-            <span class="nav-item" onclick="showPage('download', this)">Download</span>
-            <span class="nav-item" onclick="showPage('about', this)">About</span>
-            <span class="nav-item" onclick="showPage('updates', this)">Updates</span>
-            <span class="nav-item" onclick="showPage('demos', this)">Demos</span>
-            <span class="nav-item" onclick="showPage('majors', this)">Majors</span>
-            <span class="nav-item" onclick="showPage('predictions', this)">Predictions</span>
-            <span class="nav-item" onclick="showPage('support', this)">Support</span>
+        <a class="back-link" href="index.html">&larr; Back to portal</a>
+        <h1>GO:COUNTER Matchmaking</h1>
+        <p class="subtitle">Pick a mode and press play.</p>
+
+        <!-- SCREEN 1: MODE SELECT -->
+        <div id="screen-select" class="screen active">
+            <div class="modes" id="modes"></div>
+            <button class="btn btn-play" id="btn-play" disabled>Play</button>
+            <p class="hint" id="select-hint">Select a mode first.</p>
         </div>
 
-        <!-- SECTION 1: HOME -->
-        <div id="home" class="page-section active">
-            <p>> <strong>Server #1 GO:COUNTER Server 128-TICK:</strong></p>
-            <p>> Status: <span id="status-srv1" class="offline">Načítavam...</span></p>
-            <p>> Game IP: <code>connect 147.185.221.231:42131</code></p>
-            <p>> GOTV IP: <code>connect 147.185.221.231:42220</code></p>
-            
-            <hr style="border-color: #1a4d6c; margin: 15px 0;">
-
-            <p>> <strong>Server #2 GO:COUNTER Hide & Seek:</strong></p>
-            <p>> Status: <span id="status-srv2" class="offline">Načítavam...</span></p>
-            <p>> Game IP: <code>connect 147.185.221.231:42183</code></p>
-            <p>> GOTV IP: <code>connect 147.185.221.212:42228</code></p>
-        </div>
-
-        <!-- SECTION 2: DOWNLOAD -->
-        <div id="download" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">Required Downloads</h3>
-            <p><strong>Game Client (CS:GO Build)</strong><br>
-            You must use this exact client version to avoid incompatibility issues:<br>
-            <a href="https://drive.usercontent.google.com/download?id=1EEsF_eieGHUnyYZYG5_lNrFbG5Kr7OzI&export=download&authuser=0" target="_blank" class="btn-download">Download GO:COUNTER Client</a></p>
-            <p><a href="https://www.mediafire.com/file/8bxdqnpwhftg925/Nosteam_Drag_from_folder_to_csgo.zip/file" target="_blank" class="btn-download">Download NOSTEAM LAUNCHER</a></p>
-        </div>
-
-        <!-- SECTION 3: ABOUT -->
-        <div id="about" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">About Project</h3>
-            <p>This project was created out of pure retro nostalgia for players who want to experience Counter-Strike exactly how it was back in 2016 – without unnecessary modern updates, including the classic engine, SourceMod plugins, a fully functional RTV map voting system, and GOTV for future majors.</p>
-            <p>Brought to you by the community. Have fun! 🦾</p>
-        </div>
-
-        <!-- SECTION 4: UPDATES -->
-        <div id="updates" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">Latest Updates</h3>
-            <div style="background: rgba(11, 19, 31, 0.6); padding: 20px; border-radius: 8px; border-left: 3px solid #4a90e2;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(74, 144, 226, 0.2); padding-bottom: 8px;">
-                    <strong style="color: #4a90e2; font-size: 1.1em;">From bugged Steam to Nosteam</strong>
-                    <span style="color: #7084a3; font-weight: bold;">9.9.2026</span>
-                </div>
-                <div style="line-height: 1.6; margin-bottom: 25px;">
-                -From Shitty bugged Steam version to Nosteam with all skins from 2016 CS:GO<br>
-                -Fixed Rank System on Retakes<br>
-                -Fixed FastDL From Radmin VPN FastDL to Github FastDL<br>
-                -New version new maps<br>
-                -On Steam have poor optimization (laggy on Windows 11) On Nosteam runs well<br>
-                -Fixed bans and kick when you hacking or killing to much players<br>
-                -From snd_mixahead 0.5 on steam now on nosteam 0.1 now you have 10ms delay<br>
-                -Removed temporary GO:TV Because gotv crashed csgo server<br>
-                -Fixed some bugs on Retakes<br>
-                -On this version include Start Timeout<br>
-                -Fixed Switcher from headphones to 2 Speaker etc.<br>
-                -Fixed servers because on steam runs only on sv_lan 1 but now runs on your choose if you have 0 or 1<br>
-               </div>
+        <!-- SCREEN 2: SEARCHING -->
+        <div id="screen-search" class="screen">
+            <div class="panel">
+                <div class="spinner"></div>
+                <h2>Searching for a server...</h2>
+                <p id="search-mode">Mode: -</p>
+                <div class="timer" id="search-timer">00:00</div>
+                <p>Please wait, you will be asked to accept the match.</p>
             </div>
+            <button class="btn btn-cancel" id="btn-cancel">Cancel search</button>
         </div>
-        
-        <!-- SECTION 5: DEMOS (DYNAMICKÉ CEZ GITHUB RELEASES) -->
-        <div id="demos" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">Match Demos</h3>
-            
-            <div class="demo-instruction">
-                <h4 style="color: #f39c12; margin-top: 0; margin-bottom: 10px;">How to watch a downloaded demo?</h4>
-                <ol style="margin: 0; padding-left: 20px;">
-                    <li>Download the <code class="code-highlight">.zip</code> archive and extract the <code class="code-highlight">.dem</code> file.</li>
-                    <li>Move the file into your game directory (usually <code class="code-highlight">...\csgo\</code>).</li>
-                    <li>Launch CS:GO, open developer console, and type: <code class="code-highlight">playdemo file_name</code></li>
-                    <li>Press <code class="code-highlight">Shift + F2</code> to open the demo playback control panel.</li>
-                </ol>
+
+        <!-- SCREEN 3: MATCH FOUND -->
+        <div id="screen-found" class="screen">
+            <div class="panel found-panel">
+                <h2>Match found!</h2>
+                <p id="found-mode">Mode: -</p>
+                <div class="accept-bar"><div class="accept-bar-fill" id="accept-fill"></div></div>
+                <button class="btn btn-accept" id="btn-accept">Accept</button>
+                <p id="accept-left" class="hint" style="margin-top:16px;">You have 20 seconds to accept.</p>
             </div>
-
-            <table class="demo-table">
-                <thead>
-                    <tr>
-                        <th>Name / Match</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="demos-list">
-                    <tr><td colspan="3" style="text-align:center; padding: 20px; color: #888;">Načítavam zoznam dem z GitHubu...</td></tr>
-                </tbody>
-            </table>
+            <button class="btn btn-cancel" id="btn-decline">Decline</button>
         </div>
 
-        <!-- SECTION 6: MAJORS -->
-        <div id="majors" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">Classic Majors & Matches (2026)</h3>
-            <p>> If this server reaches 10 players, we’ll vote on whether to hold a CS:GO tournament; there will also be a commentator for the audience likely speaking a mix of Slovak and English so it should be fun for you.<br>
-            > Streamed live through our GO-TV server or archived for your viewing pleasure.</p>
-            
-            <table class="demo-table">
-                <thead>
-                    <tr>
-                        <th>Tournament</th>
-                        <th>Teams</th>
-                        <th>Winner</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Ghetto Major 2016 (2026)</td>
-                        <td>??</td>
-                        <td><span style="color: #00ff00;">??</span></td>
-                        <td>??</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- SECTION 7: PREDICTIONS -->
-        <div id="predictions" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">Radmin Major - Tipsters Hall of Fame</h3>
-            <p>> Submit your match outcome predictions using our official Google Form and battle for the top leaderboard spots!</p>
-            
-            <div style="text-align: center; margin: 25px 0;">
-                <a href="SEM_LINK_NA_GOOGLE_FORMULAR" target="_blank" class="btn-download" style="background: #1b4965; color: #fff; padding: 12px 20px; border: 1px solid #4a90e2; border-radius: 4px; display: inline-block;">👉 OPEN PREDICTION FORM 👈</a>
+        <!-- SCREEN 4: LAUNCHING -->
+        <div id="screen-launch" class="screen">
+            <div class="panel">
+                <h2>Joining the match...</h2>
+                <p>Starting the game and connecting to the server.</p>
+                <p class="warn" style="margin-top:14px;">If the game did not start by itself, open the console (<b>~</b>) and paste this command (already copied):</p>
+                <div class="cmd-box" id="cmd-box">connect</div>
+                <button class="btn btn-cancel" id="btn-copy">Copy command again</button>
             </div>
-
-            <h4 style="color: #4a90e2; margin-top: 30px;">Leaderboard (Top Tipsters)</h4>
-            <table class="demo-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Tipster Name</th>
-                        <th>Correct Tips</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td class="rank-1">1</td><td>--</td><td>--</td><td>👑 King of Predictions</td></tr>
-                    <tr><td class="rank-2">2</td><td>--</td><td>--</td><td>🥈 Elite Tipster</td></tr>
-                    <tr><td class="rank-3">3</td><td>--</td><td>--</td><td>🥉 Pro Tipster</td></tr>
-                    <tr><td>4</td><td>--</td><td>--</td><td class="participant">Participant</td></tr>
-                    <tr><td>5</td><td>--</td><td>--</td><td class="participant">Participant</td></tr>
-                </tbody>
-            </table>
+            <button class="btn btn-cancel" id="btn-again">Back to modes</button>
         </div>
 
-        <!-- SECTION 8: SUPPORT -->
-        <div id="support" class="page-section">
-            <h3 style="color:#4a90e2; margin-top:0;">Private Support</h3>
-            <p>Did you find a bug or a map error? Let me know here. It will be sent directly to my email and no one else will see it.</p>
-
-            <form action="https://formspree.io/f/xdenznzr" method="POST">
-                <label style="display: block; margin-top: 10px;">Your Name (Player):</label>
-                <input type="text" name="player_name" required placeholder="E.g. JohnDoe" style="width:100%; padding:10px; margin-top: 5px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box;">
-
-                <label style="display: block; margin-top: 10px;">Your Email (if you want a reply):</label>
-                <input type="email" name="_replyto" placeholder="your@email.com" style="width:100%; padding:10px; margin-top: 5px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box;">
-
-                <label style="display: block; margin-top: 10px;">Issue Category:</label>
-                <select name="category" style="width:100%; padding:10px; margin-top: 5px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box;">
-                    <option value="Bug">Server Bug</option>
-                    <option value="Map Error">Map Error / Stuck</option>
-                    <option value="Other">Other</option>
-                </select>
-
-                <label style="display: block; margin-top: 10px;">Problem Description:</label>
-                <textarea name="message" rows="5" required placeholder="Describe what happened..." style="width:100%; padding:10px; margin-top: 5px; background: #333; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box;"></textarea>
-
-                <button type="submit" style="background: #4CAF50; color: white; padding: 12px 15px; border: none; border-radius: 4px; cursor: pointer; width:100%; font-weight: bold; margin-top: 15px;">Send Message</button>
-            </form>
+        <!-- SCREEN 5: MESSAGE (declined / expired) -->
+        <div id="screen-message" class="screen">
+            <div class="panel">
+                <h2 id="msg-title">Match cancelled</h2>
+                <p id="msg-text"></p>
+            </div>
+            <button class="btn" id="btn-msg-back">Back to modes</button>
         </div>
     </div>
 
-    <!-- JavaScript for Tab Switching, GitHub Demos & JSONBin Status Checker -->
     <script>
-        function showPage(pageId, element) {
-            var sections = document.getElementsByClassName('page-section');
-            for (var i = 0; i < sections.length; i++) {
-                sections[i].classList.remove('active');
+        /* =============== CONFIG: edit here =============== */
+        var CONFIG = {
+            appId: "4465480",          // Steam app ID of the game (from steam.inf)
+            searchMinSeconds: 10,      // shortest search time
+            searchMaxSeconds: 30,      // longest search time (set both to 70 for a fixed 1:10)
+            acceptSeconds: 20,         // time to press Accept
+            modes: {
+                competitive: {
+                    label: "Competitive",
+                    desc: "5v5 &middot; 128 tick &middot; de_nuke",
+                    addr: "cairo-untimed.tun.ply.gg:40471"
+                },
+                wingman: {
+                    label: "Wingman",
+                    desc: "2v2 &middot; GO:COUNTER",
+                    addr: "ADRESA_WINGMAN:PORT"      // put the playit.gg address here
+                },
+                retakes: {
+                    label: "Retakes",
+                    desc: "Plugin mode &middot; practice",
+                    addr: "ADRESA_RETAKES:PORT"      // put the playit.gg address here
+                }
             }
-            
-            var menuItems = document.getElementsByClassName('nav-item');
-            for (var i = 0; i < menuItems.length; i++) {
-                menuItems[i].classList.remove('active');
-            }
-            
-            document.getElementById(pageId).classList.add('active');
-            element.classList.add('active');
+        };
+        /* ================================================= */
+
+        var selectedMode = null;
+        var searchTimeout = null;
+        var searchTick = null;
+        var acceptTick = null;
+
+        function isReady(mode) {
+            return mode.addr.indexOf("ADRESA") === -1;
         }
 
-        // Automatické načítanie dem z GitHub Releases
-        async function loadDemosFromGitHub() {
-            const tbody = document.getElementById("demos-list");
-            // Úprava: Správny formát pre GitHub API (username/repozitar)
-            const repoOwnerAndName = "lukasss895/GOCOUNTER.STEAM.CS"; 
+        function show(id) {
+            var screens = document.getElementsByClassName("screen");
+            for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
+            document.getElementById(id).classList.add("active");
+        }
 
+        function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+        function buildModes() {
+            var box = document.getElementById("modes");
+            box.innerHTML = "";
+            Object.keys(CONFIG.modes).forEach(function (key) {
+                var m = CONFIG.modes[key];
+                var div = document.createElement("div");
+                div.className = "mode" + (isReady(m) ? "" : " disabled");
+                div.setAttribute("data-key", key);
+                div.innerHTML = "<h3>" + m.label + "</h3><p>" + m.desc + "</p>" +
+                    (isReady(m) ? "" : "<span class=\"tag\">Coming soon</span>");
+                if (isReady(m)) {
+                    div.addEventListener("click", function () { selectMode(key); });
+                }
+                box.appendChild(div);
+            });
+        }
+
+        function selectMode(key) {
+            selectedMode = key;
+            var cards = document.getElementsByClassName("mode");
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].classList.toggle("selected", cards[i].getAttribute("data-key") === key);
+            }
+            document.getElementById("btn-play").disabled = false;
+            document.getElementById("select-hint").textContent = "Selected: " + CONFIG.modes[key].label;
+        }
+
+        function clearTimers() {
+            clearTimeout(searchTimeout);
+            clearInterval(searchTick);
+            clearInterval(acceptTick);
+        }
+
+        function backToSelect() {
+            clearTimers();
+            show("screen-select");
+        }
+
+        function startSearch() {
+            if (!selectedMode) return;
+            var mode = CONFIG.modes[selectedMode];
+            clearTimers();
+            document.getElementById("search-mode").textContent = "Mode: " + mode.label;
+            show("screen-search");
+
+            var min = CONFIG.searchMinSeconds, max = CONFIG.searchMaxSeconds;
+            var duration = Math.round(min + Math.random() * (max - min));
+            var started = Date.now();
+            var timerEl = document.getElementById("search-timer");
+            timerEl.textContent = "00:00";
+
+            searchTick = setInterval(function () {
+                var s = Math.floor((Date.now() - started) / 1000);
+                timerEl.textContent = pad(Math.floor(s / 60)) + ":" + pad(s % 60);
+            }, 250);
+
+            searchTimeout = setTimeout(function () {
+                clearInterval(searchTick);
+                matchFound();
+            }, duration * 1000);
+        }
+
+        function beep() {
             try {
-                const response = await fetch(`https://api.github.com/repos/${repoOwnerAndName}/releases`);
-                const releases = await response.json();
+                var C = window.AudioContext || window.webkitAudioContext;
+                if (!C) return;
+                var ctx = new C();
+                [660, 880].forEach(function (f, i) {
+                    var o = ctx.createOscillator();
+                    var g = ctx.createGain();
+                    o.frequency.value = f;
+                    g.gain.value = 0.08;
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.2);
+                    o.stop(ctx.currentTime + i * 0.2 + 0.15);
+                });
+            } catch (e) { /* sound is optional */ }
+        }
 
-                if (!Array.isArray(releases) || releases.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #888;">Zatiaľ nie sú k dispozícii žiadne demá.</td></tr>';
+        function matchFound() {
+            var mode = CONFIG.modes[selectedMode];
+            document.getElementById("found-mode").textContent = "Mode: " + mode.label;
+            show("screen-found");
+            beep();
+
+            var left = CONFIG.acceptSeconds;
+            var fill = document.getElementById("accept-fill");
+            var txt = document.getElementById("accept-left");
+            fill.style.width = "100%";
+            txt.textContent = "You have " + left + " seconds to accept.";
+
+            clearInterval(acceptTick);
+            acceptTick = setInterval(function () {
+                left--;
+                fill.style.width = Math.max(0, (left / CONFIG.acceptSeconds) * 100) + "%";
+                txt.textContent = "You have " + Math.max(left, 0) + " seconds to accept.";
+                if (left <= 0) {
+                    clearInterval(acceptTick);
+                    showMessage("Match expired", "You did not accept in time. Search again when you are ready.");
+                }
+            }, 1000);
+        }
+
+        function showMessage(title, text) {
+            clearTimers();
+            document.getElementById("msg-title").textContent = title;
+            document.getElementById("msg-text").textContent = text;
+            show("screen-message");
+        }
+
+        function copyText(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text);
                     return;
                 }
-
-                tbody.innerHTML = "";
-
-                releases.forEach(release => {
-                    if (release.assets && release.assets.length > 0) {
-                        release.assets.forEach(asset => {
-                            const date = new Date(asset.created_at).toLocaleString("sk-SK");
-                            const row = document.createElement("tr");
-
-                            row.innerHTML = `
-                                <td><strong>${asset.name}</strong></td>
-                                <td>${date}</td>
-                                <td><a href="${asset.browser_download_url}" class="btn-download" download>Stiahnuť (.zip)</a></td>
-                            `;
-                            tbody.appendChild(row);
-                        });
-                    }
-                });
-
-                if (tbody.innerHTML === "") {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #888;">Žiadne súbory na stiahnutie.</td></tr>';
-                }
-
-            } catch (error) {
-                console.error("Chyba pri načítavaní dem:", error);
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #ff5555;">Chyba pri načítavaní zoznamu dem z GitHubu.</td></tr>';
-            }
+            } catch (e) { /* fall through */ }
+            try {
+                var ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+            } catch (e) { /* copy is optional, the command is shown on screen */ }
         }
 
-        function checkServerStatusFromCloud() {
-            fetch('https://api.jsonbin.io/v3/b/6a7c5233da38895dfed9fd53/latest')
-                .then(res => res.json())
-                .then(data => {
-                    const el1 = document.getElementById('status-srv1');
-                    if (data.record.status === 'online') {
-                        el1.className = 'status';
-                        el1.innerHTML = 'ONLINE';
-                    } else {
-                        el1.className = 'offline';
-                        el1.innerHTML = 'OFFLINE';
-                    }
-                })
-                .catch(err => console.error('Chyba server 1:', err));
+        function accept() {
+            clearTimers();
+            var mode = CONFIG.modes[selectedMode];
+            var cmd = "connect " + mode.addr;
+            document.getElementById("cmd-box").textContent = cmd;
+            copyText(cmd);
+            show("screen-launch");
 
-            fetch('https://api.jsonbin.io/v3/b/6a7c5245f5f4af5e290b7c43/latest')
-                .then(res => res.json())
-                .then(data => {
-                    const el2 = document.getElementById('status-srv2');
-                    if (data.record.status === 'online') {
-                        el2.className = 'status';
-                        el2.innerHTML = 'ONLINE';
-                    } else {
-                        el2.className = 'offline';
-                        el2.innerHTML = 'OFFLINE';
-                    }
-                })
-                .catch(err => console.error('Chyba server 2:', err));
+            // Ask Steam to start the game and connect straight away.
+            var url = "steam://run/" + CONFIG.appId + "//+connect%20" + mode.addr;
+            window.location.href = url;
         }
 
-        // Spustenie pri naštartovaní stránky
-        loadDemosFromGitHub();
-        checkServerStatusFromCloud();
-        setInterval(checkServerStatusFromCloud, 10000);
+        document.getElementById("btn-play").addEventListener("click", startSearch);
+        document.getElementById("btn-cancel").addEventListener("click", backToSelect);
+        document.getElementById("btn-accept").addEventListener("click", accept);
+        document.getElementById("btn-decline").addEventListener("click", function () {
+            showMessage("Match declined", "You declined the match.");
+        });
+        document.getElementById("btn-copy").addEventListener("click", function () {
+            copyText(document.getElementById("cmd-box").textContent);
+        });
+        document.getElementById("btn-again").addEventListener("click", backToSelect);
+        document.getElementById("btn-msg-back").addEventListener("click", backToSelect);
+
+        buildModes();
     </script>
 
 </body>
