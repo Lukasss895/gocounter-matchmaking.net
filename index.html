@@ -448,7 +448,7 @@
         function accept() {
             clearTimers();
             
-            // Prehrá výhradne lets_roll.mp3 bez opakovaného spustenia predchádzajúceho zvuku
+            // Prehrá lets_roll.mp3 samostatne
             try {
                 var soundRoll = new Audio("lets_roll.mp3");
                 soundRoll.play();
@@ -460,8 +460,11 @@
             copyText(cmd);
             show("screen-launch");
 
-            var url = "steam://run/" + CONFIG.appId + "//+connect%20" + mode.addr;
-            window.location.href = url;
+            // Opoźdené otvorenie hry o 500ms, aby sa zvuk v pokoji dohrál
+            setTimeout(function() {
+                var url = "steam://run/" + CONFIG.appId + "//+connect%20" + mode.addr;
+                window.location.href = url;
+            }, 500);
         }
 
         document.getElementById("btn-play").addEventListener("click", startSearch);
