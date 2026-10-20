@@ -1,118 +1,257 @@
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CS:GO Server - Demos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GO:COUNTER - GOTV Demos (2016 Scaleform)</title>
     <style>
+        :root {
+            --cs-bg: #0b131f;
+            --cs-panel: rgba(16, 26, 43, 0.9);
+            --cs-border: #253654;
+            --cs-blue: #4a90e2;
+            --cs-green: #2e7d32;
+            --cs-green-bright: #00ff00;
+            --cs-text: #bdcbf4;
+            --cs-text-dim: #7084a3;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+            background-image: url('jOyiMr.webp');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: var(--cs-bg);
+            color: var(--cs-text);
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #262626;
+
+        .scaleform-container {
+            width: 100%;
+            max-width: 860px;
+            background: rgba(11, 19, 31, 0.92);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 2px solid var(--cs-border);
+            box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.95);
+            position: relative;
         }
-        h1 {
-            color: #f39c12;
-            border-bottom: 2px solid #f39c12;
-            padding-bottom: 10px;
-            margin-top: 0;
-        }
-        p {
-            line-height: 1.6;
-        }
-        .instruction {
-            background-color: #333;
-            padding: 15px;
-            border-left: 4px solid #f39c12;
+
+        /* Scaleform horná lišta / hlavička */
+        .sc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--cs-border);
+            padding-bottom: 15px;
             margin-bottom: 25px;
-            border-radius: 0 4px 4px 0;
         }
-        table {
+
+        .sc-title {
+            font-size: 26px;
+            color: var(--cs-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .back-link {
+            color: var(--cs-blue);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: 1px solid var(--cs-border);
+            padding: 6px 14px;
+            background: rgba(5, 8, 13, 0.5);
+            transition: all 0.2s;
+        }
+        .back-link:hover { background: var(--cs-blue); color: #fff; border-color: var(--cs-blue); }
+
+        /* Sekcia pre GOTV naživo / pripojenie */
+        .gotv-live-box {
+            background: var(--cs-panel);
+            border: 1px solid var(--cs-border);
+            border-left: 4px solid var(--cs-green-bright);
+            padding: 18px 20px;
+            margin-bottom: 25px;
+        }
+
+        .gotv-live-box h3 {
+            margin: 0 0 8px 0;
+            color: #fff;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .gotv-live-box p {
+            margin: 4px 0;
+            font-size: 13px;
+            color: var(--cs-text-dim);
+        }
+
+        .gotv-live-box code {
+            color: var(--cs-green-bright);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            font-family: inherit;
+        }
+
+        /* Tabuľka pre archív demo súborov */
+        .demos-table-wrapper {
+            margin-bottom: 25px;
+            overflow-x: auto;
+        }
+
+        .sc-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #444;
+            font-size: 13.5px;
         }
-        th {
-            background-color: #333;
-            color: #f39c12;
+
+        .sc-table th, .sc-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--cs-border);
         }
-        tr:hover {
-            background-color: #2d2d2d;
+
+        .sc-table th {
+            color: var(--cs-blue);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            background: rgba(5, 8, 13, 0.6);
         }
-        .btn-download {
-            background-color: #f39c12;
-            color: #1a1a1a;
-            padding: 6px 12px;
-            text-decoration: none;
-            border-radius: 4px;
+
+        .sc-table tr:hover {
+            background: rgba(74, 144, 226, 0.05);
+        }
+
+        /* Tlačidlá sťahovania / prepojenia */
+        .btn-action {
+            background: #1b4965;
+            color: #fff;
+            border: 1px solid var(--cs-blue);
+            padding: 8px 16px;
+            font-family: inherit;
             font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
             transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
+
+        .btn-action:hover {
+            background: #256a94;
+        }
+
+        .btn-download {
+            background: var(--cs-green);
+            border-color: var(--cs-green-bright);
+        }
+
         .btn-download:hover {
-            background-color: #e67e22;
+            background: #3b9a40;
         }
-        code {
-            background-color: #111;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #ff7675;
+
+        /* Spodná informačná lišta */
+        .sc-footer {
+            font-size: 12px;
+            color: var(--cs-text-dim);
+            border-top: 1px solid var(--cs-border);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--cs-green-bright);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--cs-green-bright);
+            margin-right: 6px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>CS:GO Zápasy & Demá</h1>
-    
-    <div class="instruction">
-        <h3>Ako si pozrieť stiahnuté demo?</h3>
-        <ol>
-            <li>Stiahni súbor <code>.dem</code> pomocou tlačidla nižšie.</li>
-            <li>Presuň ho do zložky s hrou (napr. <code>C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\csgo\</code>).</li>
-            <li>Spusť CS:GO, otvor konzolu a napíš: <code>playdemo nazov_suboru</code></li>
-            <li>Stlačením <code>Shift + F2</code> otvoríš ovládací panel prehrávania.</li>
-        </ol>
-    </div>
+    <div class="scaleform-container">
+        <!-- HLAVIČKA -->
+        <div class="sc-header">
+            <h1 class="sc-title">GO:COUNTER // GOTV Demos</h1>
+            <a class="back-link" href="index.html">&larr; Back</a>
+        </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Dátum zápasu</th>
-                <th>Mapa</th>
-                <th>Súbor</th>
-                <th>Akcia</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>16. 07. 2026</td>
-                <td>de_dust2</td>
-                <td><code>match_20260716_dust2.dem</code></td>
-                <td><a href="demos/match_20260716_dust2.dem" class="btn-download" download>Stiahnuť</a></td>
-            </tr>
-            <tr>
-                <td>16. 07. 2026</td>
-                <td>cs_insertion</td>
-                <td><code>match_20260716_insertion.dem</code></td>
-                <td><a href="demos/match_20260716_insertion.dem" class="btn-download" download>Stiahnuť</a></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <!-- GOTV LIVE PRIPOJENIE -->
+        <div class="gotv-live-box">
+            <h3>🔴 GOTV Spectator Live</h3>
+            <p>Watch active matches live in-game through GOTV:</p>
+            <p>> Command: <code>connect 147.185.221.214:20379</code></p>
+        </div>
+
+        <!-- ARCHÍV DEM -->
+        <h3 style="color: #fff; font-size: 16px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Match Demo Archives</h3>
+        
+        <div class="demos-table-wrapper">
+            <table class="sc-table">
+                <thead>
+                    <tr>
+                        <th>Map</th>
+                        <th>Mode / Match</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>de_dust2</td>
+                        <td>Competitive (5v5) - Round #12</td>
+                        <td>2026-10-18</td>
+                        <td>
+                            <a href="#" class="btn-action btn-download">Download .dem</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>de_inferno</td>
+                        <td>Wingman (2v2) - Semifinal</td>
+                        <td>2026-10-17</td>
+                        <td>
+                            <a href="#" class="btn-action btn-download">Download .dem</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>de_mirage</td>
+                        <td>Retakes - Session #4</td>
+                        <td>2026-10-15</td>
+                        <td>
+                            <a href="#" class="btn-action btn-download">Download .dem</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pätička -->
+        <div class="sc-footer">
+            <span><span class="status-dot"></span>GOTV Recording System Active</span>
+            <span>GO:COUNTER 2016 Restoration</span>
+        </div>
+    </div>
 
 </body>
 </html>
