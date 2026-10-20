@@ -311,6 +311,31 @@
         };
         /* ================================================= */
 
+        /* =============== AUDIO SYSTEM (GLOBÁLNE) ========== */
+        var audioMatchFound = new Audio("match_found.mp3");
+        var audioLetsRoll = new Audio("lets_roll.mp3");
+
+        function playMatchFound() {
+            try {
+                audioLetsRoll.pause();
+                audioLetsRoll.currentTime = 0;
+                audioMatchFound.pause();
+                audioMatchFound.currentTime = 0;
+                audioMatchFound.play();
+            } catch (e) { console.log("Audio error:", e); }
+        }
+
+        function playLetsRoll() {
+            try {
+                audioMatchFound.pause();
+                audioMatchFound.currentTime = 0;
+                audioLetsRoll.pause();
+                audioLetsRoll.currentTime = 0;
+                audioLetsRoll.play();
+            } catch (e) { console.log("Audio error:", e); }
+        }
+        /* ================================================= */
+
         var selectedMode = null;
         var searchTimeout = null;
         var searchTick = null;
@@ -395,11 +420,8 @@
             document.getElementById("found-mode").textContent = "Mode: " + mode.label;
             show("screen-found");
             
-            // Prehrá iba match_found.mp3
-            try {
-                var soundMatch = new Audio("match_found.mp3");
-                soundMatch.play();
-            } catch (e) { console.log("Audio error:", e); }
+            // Spustí iba match found zvuk a stlmí ten druhý
+            playMatchFound();
 
             var left = CONFIG.acceptSeconds;
             var fill = document.getElementById("accept-fill");
@@ -414,6 +436,8 @@
                 txt.textContent = "You have " + Math.max(left, 0) + " seconds to accept.";
                 if (left <= 0) {
                     clearInterval(acceptTick);
+                    audioMatchFound.pause(); // Zastaví zvuk pri vypršaní
+                    audioMatchFound.currentTime = 0;
                     showMessage("Match expired", "You did not accept in time. Search again when you are ready.");
                 }
             }, 1000);
@@ -421,6 +445,10 @@
 
         function showMessage(title, text) {
             clearTimers();
+            audioMatchFound.pause();
+            audioMatchFound.currentTime = 0;
+            audioLetsRoll.pause();
+            audioLetsRoll.currentTime = 0;
             document.getElementById("msg-title").textContent = title;
             document.getElementById("msg-text").textContent = text;
             show("screen-message");
@@ -448,11 +476,8 @@
         function accept() {
             clearTimers();
             
-            // Prehrá lets_roll.mp3 samostatne
-            try {
-                var soundRoll = new Audio("lets_roll.mp3");
-                soundRoll.play();
-            } catch (e) { console.log("Audio error:", e); }
+            // Okamžite zastaví match_found a prehraje iba lets_roll
+            playLetsRoll();
 
             var mode = CONFIG.modes[selectedMode];
             var cmd = "connect " + mode.addr;
@@ -460,17 +485,20 @@
             copyText(cmd);
             show("screen-launch");
 
-            // Opoźdené otvorenie hry o 500ms, aby sa zvuk v pokoji dohrál
+            // Opoźdené otvorenie hry o 600ms, aby sa lets_roll v pokoji dohrál
             setTimeout(function() {
                 var url = "steam://run/" + CONFIG.appId + "//+connect%20" + mode.addr;
                 window.location.href = url;
-            }, 500);
+            }, 600);
         }
 
         document.getElementById("btn-play").addEventListener("click", startSearch);
         document.getElementById("btn-cancel").addEventListener("click", backToSelect);
         document.getElementById("btn-accept").addEventListener("click", accept);
         document.getElementById("btn-decline").addEventListener("click", function () {
+            audioMatchFound.pause();
+            audioMatchFound.currentTime = 0;
+            playLetsRoll(); // Alebo môžeš nechať bez zvuku, tu prehrá lets_roll pri odmietnutí
             showMessage("Match declined", "You declined the match.");
         });
         document.getElementById("btn-copy").addEventListener("click", function () {
