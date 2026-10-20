@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GO:COUNTER - Servers</title>
+    <style>
+        :root {
+            --cs-bg: #0b131f;
+            --cs-panel: rgba(16, 26, 43, 0.9);
+            --cs-border: #253654;
+            --cs-blue: #4a90e2;
+            --cs-green: #2e7d32;
+            --cs-green-bright: #00ff00;
+            --cs-text: #bdcbf4;
+            --cs-text-dim: #7084a3;
+        }
+
+        body {
+            background-image: url('jOyiMr.webp');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: var(--cs-bg);
+            color: var(--cs-text);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .scaleform-container {
+            width: 100%;
+            max-width: 860px;
+            background: rgba(11, 19, 31, 0.92);
+            padding: 30px;
+            border: 2px solid var(--cs-border);
+            box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.95);
+            position: relative;
+        }
+
+        /* Scaleform horná lišta / hlavička */
+        .sc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--cs-border);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .sc-title {
+            font-size: 26px;
+            color: var(--cs-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .back-link {
+            color: var(--cs-blue);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: 1px solid var(--cs-border);
+            padding: 6px 14px;
+            background: rgba(5, 8, 13, 0.5);
+            transition: all 0.2s;
+        }
+        .back-link:hover { background: var(--cs-blue); color: #fff; border-color: var(--cs-blue); }
+
+        /* Zoznam serverov v štýle CS:GO server browseru */
+        .server-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .server-card {
+            background: var(--cs-panel);
+            border: 1px solid var(--cs-border);
+            border-left: 4px solid var(--cs-blue);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.1s ease, border-color 0.2s;
+        }
+
+        .server-card:hover {
+            border-color: var(--cs-blue);
+            background: rgba(20, 34, 56, 0.95);
+        }
+
+        .server-info h3 {
+            margin: 0 0 5px 0;
+            color: #fff;
+            font-size: 17px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .server-info p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--cs-text-dim);
+        }
+
+        .server-info code {
+            color: var(--cs-green-bright);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            font-family: inherit;
+        }
+
+        /* Tlačidlá pripojenia (Scaleform štýl) */
+        .btn-connect {
+            background: var(--cs-green);
+            color: #fff;
+            border: 1px solid var(--cs-green-bright);
+            padding: 10px 22px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-connect:hover {
+            background: #3b9a40;
+        }
+
+        /* Spodná informačná lišta */
+        .sc-footer {
+            font-size: 12px;
+            color: var(--cs-text-dim);
+            border-top: 1px solid var(--cs-border);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--cs-green-bright);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--cs-green-bright);
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scaleform-container">
+        <!-- HLAVIČKA -->
+        <div class="sc-header">
+            <h1 class="sc-title">GO:COUNTER // Server Browser</h1>
+            <a class="back-link" href="index.html">&larr; Back</a>
+        </div>
+
+        <!-- ZOZNAM SERVEROV -->
+        <div class="server-list">
+            <!-- Server 1 -->
+            <div class="server-card" style="border-left-color: var(--cs-green-bright);">
+                <div class="server-info">
+                    <h3>1. GO:COUNTER 128-TICK (Competitive)</h3>
+                    <p>IP: <code>147.185.221.215:40471</code> &middot; 128 Tick &middot; 5v5</p>
+                </div>
+                <a href="steam://run/4465480//+connect%20147.185.221.215:40471" class="btn-connect">Connect</a>
+            </div>
+
+            <!-- Server 2 -->
+            <div class="server-card">
+                <div class="server-info">
+                    <h3>2. GO:COUNTER Wingman</h3>
+                    <p>IP: <code>147.185.221.213:6469</code> &middot; 2v2 Mode</p>
+                </div>
+                <a href="steam://run/4465480//+connect%20147.185.221.213:6469" class="btn-connect">Connect</a>
+            </div>
+
+            <!-- Server 3 -->
+            <div class="server-card">
+                <div class="server-info">
+                    <h3>3. GO:COUNTER Retakes</h3>
+                    <p>IP: <code>147.185.221.214:33187</code> &middot; Warmup / Practice</p>
+                </div>
+                <a href="steam://run/4465480//+connect%20147.185.221.214:33187" class="btn-connect">Connect</a>
+            </div>
+        </div>
+
+        <!-- Pätka -->
+        <div class="sc-footer">
+            <span><span class="status-dot"></span>Master Servers Online (128-Tick Architecture)</span>
+            <span>GO:COUNTER 2016 Restoration</span>
+        </div>
+    </div>
+
+</body>
+</html>
