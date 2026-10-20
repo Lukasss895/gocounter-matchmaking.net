@@ -311,27 +311,6 @@
         };
         /* ================================================= */
 
-        /* =============== AUDIO SYSTEM ==================== */
-        var soundMatchFound = new Audio("match_found.mp3");
-        var soundLetsRoll = new Audio("lets_roll.mp3");
-
-        function playMatchFoundSound() {
-            try {
-                soundMatchFound.pause();
-                soundMatchFound.currentTime = 0;
-                soundMatchFound.play();
-            } catch (e) { console.log("Audio error:", e); }
-        }
-
-        function playLetsRollSound() {
-            try {
-                soundLetsRoll.pause();
-                soundLetsRoll.currentTime = 0;
-                soundLetsRoll.play();
-            } catch (e) { console.log("Audio error:", e); }
-        }
-        /* ================================================= */
-
         var selectedMode = null;
         var searchTimeout = null;
         var searchTick = null;
@@ -416,7 +395,11 @@
             document.getElementById("found-mode").textContent = "Mode: " + mode.label;
             show("screen-found");
             
-            playMatchFoundSound();
+            // Prehrá iba match_found.mp3
+            try {
+                var soundMatch = new Audio("match_found.mp3");
+                soundMatch.play();
+            } catch (e) { console.log("Audio error:", e); }
 
             var left = CONFIG.acceptSeconds;
             var fill = document.getElementById("accept-fill");
@@ -465,8 +448,11 @@
         function accept() {
             clearTimers();
             
-            // Prehrá IBA lets_roll zvuk
-            playLetsRollSound();
+            // Prehrá výhradne lets_roll.mp3 bez opakovaného spustenia predchádzajúceho zvuku
+            try {
+                var soundRoll = new Audio("lets_roll.mp3");
+                soundRoll.play();
+            } catch (e) { console.log("Audio error:", e); }
 
             var mode = CONFIG.modes[selectedMode];
             var cmd = "connect " + mode.addr;
