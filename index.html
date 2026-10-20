@@ -287,10 +287,10 @@
     <script>
         /* =============== CONFIG: edit here =============== */
         var CONFIG = {
-            appId: "4465480",          // Steam app ID of the game
-            searchMinSeconds: 10,      // shortest search time
-            searchMaxSeconds: 30,      // longest search time
-            acceptSeconds: 20,         // time to press Accept
+            appId: "4465480",
+            searchMinSeconds: 10,
+            searchMaxSeconds: 30,
+            acceptSeconds: 20,
             modes: {
                 competitive: {
                     label: "Competitive",
@@ -317,6 +317,7 @@
 
         function playMatchFoundSound() {
             try {
+                soundMatchFound.pause();
                 soundMatchFound.currentTime = 0;
                 soundMatchFound.play();
             } catch (e) { console.log("Audio error:", e); }
@@ -324,6 +325,7 @@
 
         function playLetsRollSound() {
             try {
+                soundLetsRoll.pause();
                 soundLetsRoll.currentTime = 0;
                 soundLetsRoll.play();
             } catch (e) { console.log("Audio error:", e); }
@@ -414,7 +416,6 @@
             document.getElementById("found-mode").textContent = "Mode: " + mode.label;
             show("screen-found");
             
-            // Prehrá CS:GO match found zvuk
             playMatchFoundSound();
 
             var left = CONFIG.acceptSeconds;
@@ -464,7 +465,7 @@
         function accept() {
             clearTimers();
             
-            // Prehrá hlášku "Let's roll!" pri akceptovaní
+            // Prehrá IBA lets_roll zvuk
             playLetsRollSound();
 
             var mode = CONFIG.modes[selectedMode];
@@ -473,7 +474,6 @@
             copyText(cmd);
             show("screen-launch");
 
-            // Otvorí hru cez Steam protokol
             var url = "steam://run/" + CONFIG.appId + "//+connect%20" + mode.addr;
             window.location.href = url;
         }
