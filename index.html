@@ -1,418 +1,514 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>GO:COUNTER - 2016 CS:GO notes</title>
-	
-	<style>
-		*, *::before, *::after {
-			box-sizing: border-box;
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GO:COUNTER - Matchmaking</title>
+    <style>
+        body {
+            background-image: url('jOyiMr.webp');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #0b0f14;
+            color: #bdcbf4;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(11, 19, 31, 0.85);
+            padding: 40px;
+            border: 2px solid #253654;
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #4a90e2;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #7084a3;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+        .back-link {
+            display: inline-block;
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { color: #fff; }
 
-		html, body {
-			background-color: #0c0f12;
-			color: #8c8f94;
-			font-family: Arial, Helvetica, sans-serif;
-			font-size: 13px;
-			margin: 0;
-			padding: 0;
-			width: 100%;
-			overflow-x: hidden;
-		}
+        .screen { display: none; }
+        .screen.active { display: block; }
 
-		a { color: #3f79aa; text-decoration: none; }
-		a:hover { color: #ffffff; text-decoration: underline; }
+        /* Mode cards */
+        .modes {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .mode {
+            flex: 1 1 200px;
+            max-width: 240px;
+            background: rgba(5, 8, 13, 0.9);
+            border: 2px solid #253654;
+            border-left: 3px solid #4a90e2;
+            padding: 18px 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .mode:hover { border-color: #4a90e2; }
+        .mode.selected {
+            border-color: #00ff00;
+            border-left-color: #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        .mode.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .mode.disabled:hover { border-color: #253654; }
+        .mode h3 {
+            margin: 0 0 6px 0;
+            color: #fff;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .mode p {
+            margin: 0;
+            font-size: 12px;
+            color: #7084a3;
+            line-height: 1.5;
+        }
+        .mode .tag {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #f39c12;
+        }
 
-		/* Šírka 860px */
-		#container {
-			width: 100%;
-			max-width: 860px;
-			margin: 0 auto;
-			position: relative;
-			padding: 0 8px 5px 8px;
-		}
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            border: 1px solid #4a90e2;
+            background: #1b4965;
+            color: #fff;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 40px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #256a94; }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .btn-play {
+            background: #2e7d32;
+            border-color: #00ff00;
+        }
+        .btn-play:hover { background: #3b9a40; }
+        .btn-accept {
+            background: #2e7d32;
+            border-color: #00ff00;
+            font-size: 20px;
+            padding: 18px 70px;
+        }
+        .btn-accept:hover { background: #3b9a40; }
+        .btn-cancel {
+            background: transparent;
+            border-color: #7084a3;
+            color: #bdcbf4;
+            padding: 10px 28px;
+            font-size: 13px;
+        }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.08); }
 
-		/* Wildfire hlavička posunutá vyššie */
-		.header-banner {
-			width: 100%;
-			background: #0c0f12;
-			line-height: 0;
-			overflow: hidden;
-			margin-top: 12px;
-			margin-bottom: 6px;
-			border-radius: 2px 2px 0 0;
-		}
+        /* Searching */
+        .panel {
+            background: rgba(5, 8, 13, 0.9);
+            border-left: 3px solid #4a90e2;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+        }
+        .panel h2 {
+            margin: 0 0 8px 0;
+            color: #fff;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .panel p { margin: 6px 0; font-size: 14px; color: #7084a3; }
+        .timer {
+            font-size: 44px;
+            font-weight: bold;
+            color: #00ff00;
+            margin: 14px 0;
+            letter-spacing: 3px;
+        }
+        .spinner {
+            width: 34px;
+            height: 34px;
+            margin: 0 auto 10px auto;
+            border: 4px solid #253654;
+            border-top-color: #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-		.header-banner img {
-			display: block;
-			width: 100%;
-			height: auto;
-			margin: 0 auto;
-		}
+        /* Match found */
+        .found-panel {
+            border-left-color: #00ff00;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.15); }
+            50% { box-shadow: 0 0 28px rgba(0, 255, 0, 0.45); }
+        }
+        .accept-bar {
+            width: 100%;
+            height: 8px;
+            background: #253654;
+            margin: 18px 0 22px 0;
+        }
+        .accept-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: #00ff00;
+            transition: width 1s linear;
+        }
 
-		/* Navigačná lišta */
-		#navigation_container {
-			background: linear-gradient(to bottom, #1d2125 0%, #14171a 100%);
-			border: 1px solid #282d33;
-			min-height: 38px;
-			width: 100%;
-			margin-top: 0;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0 12px;
-			box-shadow: 0 4px 10px rgba(0,0,0,0.8);
-			position: relative;
-			z-index: 100;
-		}
-
-		#navigation {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-			display: flex;
-			align-items: center;
-			gap: 16px;
-		}
-
-		#navigation li {
-			position: relative;
-		}
-
-		#navigation li a {
-			color: #ffffff;
-			font-size: 12px;
-			font-weight: bold;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			white-space: nowrap;
-		}
-
-		#navigation li a:hover, #navigation li a.active {
-			color: #d1a840;
-		}
-
-		/* Dropdown ponuka */
-		.dropdownItems {
-			display: none;
-			position: absolute;
-			top: 100%;
-			left: 0;
-			background: #14171a;
-			border: 1px solid #282d33;
-			padding: 6px 10px;
-			min-width: 130px;
-			z-index: 200;
-		}
-
-		#navigation li:hover .dropdownItems {
-			display: block;
-		}
-
-		.dropdownItems a {
-			display: block;
-			padding: 4px 0;
-			font-size: 11px !important;
-		}
-
-		.dropdownItems hr {
-			border: 0;
-			border-top: 1px solid #282d33;
-			margin: 4px 0;
-		}
-
-		/* Vyhľadávanie v navigácii */
-		.nav-search input[type="text"] {
-			background: #090b0c;
-			border: 1px solid #282d33;
-			color: #ccc;
-			padding: 4px 8px;
-			font-size: 11px;
-			width: 110px;
-		}
-
-		/* Obsahový panel */
-		#content_container {
-			background-color: #111417;
-			border: 1px solid #1c2024;
-			border-top: none;
-			display: flex;
-			padding: 16px 12px;
-			gap: 18px;
-			box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-		}
-
-		#main_blog {
-			flex: 1;
-			min-width: 0;
-		}
-
-		.inner_post {
-			margin-bottom: 22px;
-			word-wrap: break-word;
-			overflow-wrap: break-word;
-		}
-
-		.inner_post h2 {
-			margin: 0 0 6px 0;
-			font-size: 18px;
-			font-weight: normal;
-		}
-
-		.inner_post h2 a {
-			color: #3f79aa;
-			text-decoration: none;
-		}
-
-		.inner_post h2 a:hover {
-			color: #ffffff;
-		}
-
-		.post_date {
-			color: #616870;
-			font-size: 11px;
-			font-weight: bold;
-			text-transform: uppercase;
-			margin-bottom: 12px;
-		}
-
-		.horizontal_rule {
-			height: 1px;
-			background: #1c2024;
-			margin: 20px 0;
-		}
-
-		/* Pravý stĺpec (Sidebar) */
-		#sidebar {
-			width: 210px;
-			flex-shrink: 0;
-		}
-
-		.sidebar_item {
-			background: #15181b;
-			border: 1px solid #212529;
-			padding: 10px;
-			margin-bottom: 14px;
-		}
-
-		.sidebar_item h5 {
-			margin: 0 0 7px 0;
-			color: #ffffff;
-			font-size: 11px;
-			text-transform: uppercase;
-			border-bottom: 1px solid #212529;
-			padding-bottom: 4px;
-		}
-
-		.sidebar-links {
-			font-size: 10px;
-			font-weight: bold;
-			margin-bottom: 10px;
-			display: flex;
-			justify-content: space-between;
-			gap: 4px;
-		}
-
-		.sidebar-links a {
-			color: #616870;
-			text-transform: uppercase;
-		}
-
-		.sidebar-links a:hover {
-			color: #ffffff;
-		}
-
-		.monthly-stat {
-			font-size: 28px;
-			font-weight: bold;
-			color: #ffffff;
-			letter-spacing: 1px;
-			line-height: 1;
-		}
-
-		.monthly-stat-sub {
-			font-size: 10px;
-			color: #616870;
-			text-transform: uppercase;
-			margin-top: 4px;
-		}
-
-		/* Update karty */
-		.valve-update-card {
-			display: block;
-			background: linear-gradient(to bottom, #1c2126 0%, #14171a 100%);
-			border: 1px solid #2c323b;
-			border-left: 3px solid #d1a840;
-			padding: 7px 9px;
-			margin-bottom: 5px;
-			color: #ffffff !important;
-			font-weight: bold;
-			font-size: 11px;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-		}
-
-		.valve-update-card:hover {
-			border-color: #d1a840;
-			background: linear-gradient(to bottom, #252b32, #181c20);
-			color: #d1a840 !important;
-			text-decoration: none !important;
-		}
-
-		#footer {
-			text-align: center;
-			padding: 15px 5px 35px 5px;
-			color: #41464c;
-			font-size: 11px;
-			line-height: 1.4;
-		}
-	</style>
+        /* Command fallback */
+        .cmd-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #253654;
+            padding: 12px;
+            margin: 14px 0;
+            font-size: 14px;
+            color: #ff7675;
+            word-break: break-all;
+            user-select: all;
+        }
+        .hint {
+            font-size: 12px;
+            color: #7084a3;
+            line-height: 1.6;
+        }
+        .warn { color: #f39c12; }
+    </style>
 </head>
-
 <body>
-	<div id="container">
 
-		<!-- Hlavička -->
-		<div class="header-banner"><img src="wildfire.png" alt=""></div>
-		
-		<!-- Navigačná lišta -->
-		<div id="navigation_container">
-			<ul id="navigation">
-				<li><a href="#">GO:COUNTER</a></li>
-				<li><a href="https://lukasss895.github.io/gocounter-matchmaking.net/" style="color: #79aa27;">PLAY MATCHMAKING</a></li>
-				<li><a href="https://lukasss895.github.io/gocounter-matchmaking.net/servers.html" style="color: #d1a840;">SERVERS</a></li>
-				<li><a href="https://lukasss895.github.io/gocounter-matchmaking.net/demos.html" style="color: #d1a840;">DEMOS</a></li>
-				<li>
-					<a style="color: #d1a840;" href="#">OTHER ▼</a>
-					<div class="dropdownItems">
-						<a style="color: #d1a840;" href="#">UPDATES</a>
-						<hr>
-						<a href="https://csgocrosshairs.com/generator/">CROSSHAIR</a>
-						<hr>
-						<a href="https://lukasss895.github.io/Inventory-Editor/">Inventory</a>
-					</div>
-				</li>
-			</ul>
+    <div class="container">
+        <a class="back-link" href="https://lukasss895.github.io/go-counter.net/">&larr; Back to portal</a>
+        <h1>GO:COUNTER Matchmaking</h1>
+        <p class="subtitle">Pick a mode and press play.</p>
 
-			<div class="nav-search">
-				<input type="text" placeholder="Search...">
-			</div>
-		</div>
+        <!-- SCREEN 1: MODE SELECT -->
+        <div id="screen-select" class="screen active">
+            <div class="modes" id="modes"></div>
+            <button class="btn btn-play" id="btn-play" disabled>Play</button>
+            <p class="hint" id="select-hint">Select a mode first.</p>
+        </div>
 
-		<!-- Obsahový blok -->
-		<div id="content_container">
+        <!-- SCREEN 2: SEARCHING -->
+        <div id="screen-search" class="screen">
+            <div class="panel">
+                <div class="spinner"></div>
+                <h2>Searching for a server...</h2>
+                <p id="search-mode">Mode: -</p>
+                <div class="timer" id="search-timer">00:00</div>
+                <p>Please wait, you will be asked to accept the match.</p>
+            </div>
+            <button class="btn btn-cancel" id="btn-cancel">Cancel search</button>
+        </div>
 
-			<!-- Príspevok v1.1 a v1.0 -->
-			<div id="main_blog">
-				<div id="post_container">
+        <!-- SCREEN 3: MATCH FOUND -->
+        <div id="screen-found" class="screen">
+            <div class="panel found-panel">
+                <h2>Match found!</h2>
+                <p id="found-mode">Mode: -</p>
+                <div class="accept-bar"><div class="accept-bar-fill" id="accept-fill"></div></div>
+                <button class="btn btn-accept" id="btn-accept">Accept</button>
+                <p id="accept-left" class="hint" style="margin-top:16px;">You have 20 seconds to accept.</p>
+            </div>
+            <button class="btn btn-cancel" id="btn-decline">Decline</button>
+        </div>
 
-					<!-- Nový príspevok v1.1 -->
-					<div class="inner_post">
-						<h2><a href="#">v1.1 - GO:COUNTER Better Than Before!</a></h2>
-						<p class="post_date">RECENT UPDATE - <span style="color: #d1a840;">GO:COUNTER</span></p>
-						
-						– New main menu design<br>
-						– Operation Wildfire Activate<br>
-						– Now the inventory is working<br>
-						– New 4 Servers with different modes: Wingman, Hide & Seek, Competitive, Retakes<br>
-						– New reward system which you got something to inventory when you play on servers<br>
-						– New find a match system<br>
-						– The CS:GO is now optimized for low-end PCs<br>
-						– Updated Wildfire Operation<br>
-						– Customized Main Menu UI<br>
-						– The CS:GO now loaded faster than before and load maps<br>
-						– Starter pack to inventory (it's a surprise)<br>
-						– The cases now don't need keys<br>
-						– Now working play with friends, but competitive is bugged so play other modes<br>
-						– My new website is added to lobby<br>
-						– Trailer will come soon<br>
-						– GO:COUNTER will come soon with full functionality<br>
-						– Fixed -insecure error<br>
-						– Fixed some bugs when you play with friends<br>
-						– Servers now run on Public IP so sometimes you may have a high ping (50 or 90)<br>
-						– FastDL is now fully functional<br>
-						– Fixed errors when you play as CT in Agency<br>
-						– In GO:COUNTER .zip you have 2 Launch Options<br>
-						– Fixed MVP plugin and music kits
-					</div>
+        <!-- SCREEN 4: LAUNCHING -->
+        <div id="screen-launch" class="screen">
+            <div class="panel">
+                <h2>Joining the match...</h2>
+                <p>Starting the game and connecting to the server.</p>
+                <p class="warn" style="margin-top:14px;">If the game did not start by itself, open the console (<b>~</b>) and paste this command (already copied):</p>
+                <div class="cmd-box" id="cmd-box">connect</div>
+                <button class="btn btn-cancel" id="btn-copy">Copy command again</button>
+            </div>
+            <button class="btn btn-cancel" id="btn-again">Back to modes</button>
+        </div>
 
-					<div class="horizontal_rule"></div>
-					
-					<div class="inner_post">
-						<h2><a href="#">v1.0 - GO:COUNTER 2016 Era Begins!</a></h2>
-						<p class="post_date">20 OCT 2026 - <span style="color: #d1a840;">GO:COUNTER</span></p>
-						
-						Welcome to the beginning of the GO:COUNTER project!<br><br>
+        <!-- SCREEN 5: MESSAGE (declined / expired) -->
+        <div id="screen-message" class="screen">
+            <div class="panel">
+                <h2 id="msg-title">Match cancelled</h2>
+                <p id="msg-text"></p>
+            </div>
+            <button class="btn" id="btn-msg-back">Back to modes</button>
+        </div>
+    </div>
 
-						<h3 style="font-size: 13px; margin: 5px 0;">Launcher &amp; Main Menu</h3>
-						– Custom modified launcher optimized for a smoother and faster gaming experience.<br>
-						– Cleaned up main menu: simplified from 5 tabs to 3 essential ones (PLAY, INVENTORY, OPTIONS).<br>
-						– Working "Play with Friends" lobby: invite and play together with your friends!<br><br>
+    <script>
+        /* =============== CONFIG: edit here =============== */
+        var CONFIG = {
+            appId: "4465480",
+            searchMinSeconds: 10,
+            searchMaxSeconds: 30,
+            acceptSeconds: 20,
+            modes: {
+                competitive: {
+                    label: "Competitive",
+                    desc: "5v5 &middot; 128 tick",
+                    addr: "147.185.221.215:40471"
+                },
+                wingman: {
+                    label: "Wingman",
+                    desc: "2v2 &middot; GO:COUNTER",
+                    addr: "147.185.221.213:6469"
+                },
+                retakes: {
+                    label: "Retakes",
+                    desc: "5V5 GO:COUNTER",
+                    addr: "147.185.221.214:33187"
+                }
+            }
+        };
+        /* ================================================= */
 
-						<h3 style="font-size: 13px; margin: 5px 0;">Inventory &amp; Upcoming Events</h3>
-						– Inventory system is currently in development and is planned to release around November or December.<br>
-						– Festive update planned for December with custom Christmas-themed maps!<br><br>
+        /* =============== AUDIO SYSTEM (GLOBÁLNE) ========== */
+        var audioMatchFound = new Audio("match_found.mp3");
+        var audioLetsRoll = new Audio("lets_roll.mp3");
 
-						<h3 style="font-size: 13px; margin: 5px 0;">Game Modes</h3>
-						– <b>Wingman:</b> Our official custom mode inspired by 2018 Wingman, updated with a fresh map pool.<br>
-						– <b>Retakes:</b> Powered by splewis’ popular plugin from GitHub.<br><br>
+        function playMatchFound() {
+            try {
+                audioLetsRoll.pause();
+                audioLetsRoll.currentTime = 0;
+                audioMatchFound.pause();
+                audioMatchFound.currentTime = 0;
+                audioMatchFound.play();
+            } catch (e) { console.log("Audio error:", e); }
+        }
 
-						<h3 style="font-size: 13px; margin: 5px 0;">Custom Matchmaking Browser</h3>
-						– Built our own Play Matchmaking system! You can access it directly in-game via the main menu browser. Simply pick your mode, wait for a match, hit Accept, and connect via the IP address provided in your console.<br><br>
+        function playLetsRoll() {
+            try {
+                audioMatchFound.pause();
+                audioMatchFound.currentTime = 0;
+                audioLetsRoll.pause();
+                audioLetsRoll.currentTime = 0;
+                audioLetsRoll.play();
+            } catch (e) { console.log("Audio error:", e); }
+        }
+        /* ================================================= */
 
-						Enjoy this fresh start and thank you for being part of the GO:COUNTER community!
-					</div>
+        var selectedMode = null;
+        var searchTimeout = null;
+        var searchTick = null;
+        var acceptTick = null;
 
-				</div>
-			</div>
+        function isReady(mode) {
+            return mode.addr.indexOf("ADRESA") === -1;
+        }
 
-			<!-- Pravý Panel (Sidebar) -->
-			<div id="sidebar">
+        function show(id) {
+            var screens = document.getElementsByClassName("screen");
+            for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
+            document.getElementById(id).classList.add("active");
+        }
 
-				<div class="sidebar-links">
-					<a href="https://download938.mediafire.com/44i3fn9kosvgWHyJI5xi7DE64KiWMsNHq2hy23eYWdPbLHrPbSYBWVJZS9TPQ5kfEjikF5LnJko21HcolnYURULjHSkuev8l4M7OOP1e2tct0a7lNFIFvA7t8KbwnIASpd4hzRWdNQbPvv_xJ3P7H_VViZLMb7cLpXTKJk0_2Jmb/ufxad7td2tqttei/GOCOUNTER.zip" target="_blank">GET GO:COUNTER &rsaquo;</a>
-					<a href="https://store.steampowered.com/app/4465480/CounterStrikeGlobal_Offensive/" target="_blank">OFFICIAL CS:GO &rsaquo;</a>
-				</div>
+        function pad(n) { return (n < 10 ? "0" : "") + n; }
 
-				<!-- Unikátni Hráči -->
-				<div class="sidebar_item">
-					<div class="monthly-stat">1</div>
-					<div class="monthly-stat-sub">Unique players on GO:COUNTER</div>
-				</div>
+        function buildModes() {
+            var box = document.getElementById("modes");
+            box.innerHTML = "";
+            Object.keys(CONFIG.modes).forEach(function (key) {
+                var m = CONFIG.modes[key];
+                var div = document.createElement("div");
+                div.className = "mode" + (isReady(m) ? "" : " disabled");
+                div.setAttribute("data-key", key);
+                div.innerHTML = "<h3>" + m.label + "</h3><p>" + m.desc + "</p>" +
+                    (isReady(m) ? "" : "<span class=\"tag\">Coming soon</span>");
+                if (isReady(m)) {
+                    div.addEventListener("click", function () { selectMode(key); });
+                }
+                box.appendChild(div);
+            });
+        }
 
-				<!-- História Aktualizácií -->
-				<div class="sidebar_item">
-					<h5>UPDATE HISTORY</h5>
-					
-					<a class="valve-update-card" href="https://www.counter-strike.net/operationwildfire" target="_blank">
-						Operation Wildfire
-					</a>
-					<a class="valve-update-card" href="https://www.counter-strike.net/reintroducing_nuke/" target="_blank">
-						Nuke is Back
-					</a>
-					<a class="valve-update-card" href="https://www.counter-strike.net/operationbloodhound" target="_blank">
-						Operation Bloodhound
-					</a>
-					<a class="valve-update-card" href="https://www.counter-strike.net/operationvanguard" target="_blank">
-						Operation Vanguard
-					</a>
-					<a class="valve-update-card" href="https://www.counter-strike.net/reintroducing_train" target="_blank">
-						Reintroducing Train
-					</a>
-				</div>
+        function selectMode(key) {
+            selectedMode = key;
+            var cards = document.getElementsByClassName("mode");
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].classList.toggle("selected", cards[i].getAttribute("data-key") === key);
+            }
+            document.getElementById("btn-play").disabled = false;
+            document.getElementById("select-hint").textContent = "Selected: " + CONFIG.modes[key].label;
+        }
 
-			</div>
+        function clearTimers() {
+            clearTimeout(searchTimeout);
+            clearInterval(searchTick);
+            clearInterval(acceptTick);
+        }
 
-		</div>
+        function backToSelect() {
+            clearTimers();
+            show("screen-select");
+        }
 
-		<!-- Pätka -->
-		<div id="footer">
-			<p>© 2016 Valve Corporation, all rights reserved.<br>
-			GO:COUNTER is restored 2016 CS:GO and is in no way affiliated with Valve.<br>
-			Visit the <a href="https://counter-strike.net" target="_blank" style="color: #616870; text-decoration: underline;">Official Counter-Strike Website</a>.</p>
-		</div>
+        function startSearch() {
+            if (!selectedMode) return;
+            var mode = CONFIG.modes[selectedMode];
+            clearTimers();
+            document.getElementById("search-mode").textContent = "Mode: " + mode.label;
+            show("screen-search");
 
-	</div>
+            var min = CONFIG.searchMinSeconds, max = CONFIG.searchMaxSeconds;
+            var duration = Math.round(min + Math.random() * (max - min));
+            var started = Date.now();
+            var timerEl = document.getElementById("search-timer");
+            timerEl.textContent = "00:00";
+
+            searchTick = setInterval(function () {
+                var s = Math.floor((Date.now() - started) / 1000);
+                timerEl.textContent = pad(Math.floor(s / 60)) + ":" + pad(s % 60);
+            }, 250);
+
+            searchTimeout = setTimeout(function () {
+                clearInterval(searchTick);
+                matchFound();
+            }, duration * 1000);
+        }
+
+        function matchFound() {
+            var mode = CONFIG.modes[selectedMode];
+            document.getElementById("found-mode").textContent = "Mode: " + mode.label;
+            show("screen-found");
+            
+            // Spustí iba match found zvuk a stlmí ten druhý
+            playMatchFound();
+
+            var left = CONFIG.acceptSeconds;
+            var fill = document.getElementById("accept-fill");
+            var txt = document.getElementById("accept-left");
+            fill.style.width = "100%";
+            txt.textContent = "You have " + left + " seconds to accept.";
+
+            clearInterval(acceptTick);
+            acceptTick = setInterval(function () {
+                left--;
+                fill.style.width = Math.max(0, (left / CONFIG.acceptSeconds) * 100) + "%";
+                txt.textContent = "You have " + Math.max(left, 0) + " seconds to accept.";
+                if (left <= 0) {
+                    clearInterval(acceptTick);
+                    audioMatchFound.pause(); // Zastaví zvuk pri vypršaní
+                    audioMatchFound.currentTime = 0;
+                    showMessage("Match expired", "You did not accept in time. Search again when you are ready.");
+                }
+            }, 1000);
+        }
+
+        function showMessage(title, text) {
+            clearTimers();
+            audioMatchFound.pause();
+            audioMatchFound.currentTime = 0;
+            audioLetsRoll.pause();
+            audioLetsRoll.currentTime = 0;
+            document.getElementById("msg-title").textContent = title;
+            document.getElementById("msg-text").textContent = text;
+            show("screen-message");
+        }
+
+        function copyText(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text);
+                    return;
+                }
+            } catch (e) { /* fall through */ }
+            try {
+                var ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+            } catch (e) { /* copy fallback */ }
+        }
+
+        function accept() {
+            clearTimers();
+            
+            // Okamžite zastaví match_found a prehraje iba lets_roll
+            playLetsRoll();
+
+            var mode = CONFIG.modes[selectedMode];
+            var cmd = "connect " + mode.addr;
+            document.getElementById("cmd-box").textContent = cmd;
+            copyText(cmd);
+            show("screen-launch");
+
+            // Opoźdené otvorenie hry o 600ms, aby sa lets_roll v pokoji dohrál
+            setTimeout(function() {
+                var url = "steam://run/" + CONFIG.appId + "//+connect%20" + mode.addr;
+                window.location.href = url;
+            }, 600);
+        }
+
+        document.getElementById("btn-play").addEventListener("click", startSearch);
+        document.getElementById("btn-cancel").addEventListener("click", backToSelect);
+        document.getElementById("btn-accept").addEventListener("click", accept);
+        document.getElementById("btn-decline").addEventListener("click", function () {
+            audioMatchFound.pause();
+            audioMatchFound.currentTime = 0;
+            playLetsRoll(); // Alebo môžeš nechať bez zvuku, tu prehrá lets_roll pri odmietnutí
+            showMessage("Match declined", "You declined the match.");
+        });
+        document.getElementById("btn-copy").addEventListener("click", function () {
+            copyText(document.getElementById("cmd-box").textContent);
+        });
+        document.getElementById("btn-again").addEventListener("click", backToSelect);
+        document.getElementById("btn-msg-back").addEventListener("click", backToSelect);
+
+        buildModes();
+    </script>
+
 </body>
 </html>
