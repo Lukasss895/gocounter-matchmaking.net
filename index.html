@@ -108,6 +108,11 @@
             font-size: 11px;
             color: #f39c12;
         }
+        .mode .tag.new {
+            color: #00ff00;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
 
         /* Buttons */
         .btn {
@@ -306,6 +311,12 @@
                     label: "Retakes",
                     desc: "5V5 GO:COUNTER",
                     addr: "147.185.221.214:33187"
+                },
+                hns: {
+                    label: "Hide & Seek",
+                    desc: "5 min &middot; Knife &amp; Nades",
+                    addr: "147.185.221.26:49062",
+                    badge: "new"
                 }
             }
         };
@@ -358,12 +369,18 @@
             box.innerHTML = "";
             Object.keys(CONFIG.modes).forEach(function (key) {
                 var m = CONFIG.modes[key];
+                var ready = isReady(m);
                 var div = document.createElement("div");
-                div.className = "mode" + (isReady(m) ? "" : " disabled");
+                div.className = "mode" + (ready ? "" : " disabled");
                 div.setAttribute("data-key", key);
-                div.innerHTML = "<h3>" + m.label + "</h3><p>" + m.desc + "</p>" +
-                    (isReady(m) ? "" : "<span class=\"tag\">Coming soon</span>");
-                if (isReady(m)) {
+                var tagHtml = "";
+                if (!ready) {
+                    tagHtml = "<span class=\"tag\">Coming soon</span>";
+                } else if (m.badge) {
+                    tagHtml = "<span class=\"tag new\">" + m.badge + "</span>";
+                }
+                div.innerHTML = "<h3>" + m.label + "</h3><p>" + m.desc + "</p>" + tagHtml;
+                if (ready) {
                     div.addEventListener("click", function () { selectMode(key); });
                 }
                 box.appendChild(div);
